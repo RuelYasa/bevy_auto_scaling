@@ -1,0 +1,11 @@
+[package]
+name = "bevy_auto_scaling"
+version = "0.1.0"
+edition = "2024"
+description = "Auto scale cameras to fit the window."
+license = "MIT"
+repository = "https://github.com/RuelYasa/bevy_auto_scaling"
+readme = "README.md"
+
+[dependencies]
+bevy = "0.15.2"

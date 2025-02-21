@@ -1,6 +1,6 @@
 # BEVY_AUTO_SCALING
 
-A very simple plugin for bevy to let graphics auto rescale and center with the window.
+A very simple plugin for bevy to rescale the graphics of cameras, freeing developers from concerning the real resolution of windows.
 
 ![image](img.png)
 

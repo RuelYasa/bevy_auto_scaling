@@ -1,17 +1,29 @@
 use bevy::{
-    app::{App, Startup, Update}, asset::Assets, color::palettes::css::{BLUE, WHITE}, core_pipeline::core_3d::Camera3d, ecs::{query::With, system::{Commands, Res, ResMut, Single}
-    }, math::{primitives::Cuboid, Vec3}, pbr::{MeshMaterial3d, PointLight, StandardMaterial}, render::{
+    DefaultPlugins,
+    app::{App, Startup, Update},
+    asset::Assets,
+    color::palettes::css::{BLUE, WHITE},
+    core_pipeline::core_3d::Camera3d,
+    ecs::{
+        query::With,
+        system::{Commands, Res, ResMut, Single},
+    },
+    math::{Vec3, primitives::Cuboid},
+    pbr::{MeshMaterial3d, PointLight, StandardMaterial},
+    render::{
         camera::{Camera, ClearColorConfig},
         mesh::{Mesh, Mesh3d},
-    }, time::Time, transform::components::Transform, DefaultPlugins
+    },
+    time::Time,
+    transform::components::Transform,
 };
 
-use bevy_auto_scaling::{FixedSize, Scale3dPlugin};
+use bevy_auto_scaling::{AspectRatio, ScalePlugin};
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugins(Scale3dPlugin)
+        .add_plugins(ScalePlugin)
         .add_systems(Startup, init)
         .add_systems(Update, spin)
         .run();
@@ -29,11 +41,8 @@ fn init(
     cmd.spawn((
         Camera3d::default(),
         PointLight::default(),
-        FixedSize {
-            width: 200.0,
-            height: 200.0,
-        },
-        Transform::from_translation(Vec3::new(4.0,1.0,2.0)).looking_at(Vec3::ZERO, Vec3::Z),
+        AspectRatio(1.5),
+        Transform::from_translation(Vec3::new(4.0, 1.0, 2.0)).looking_at(Vec3::ZERO, Vec3::Z),
         Camera {
             clear_color: ClearColorConfig::Custom(WHITE.into()),
             ..Default::default()
@@ -41,7 +50,7 @@ fn init(
     ));
 }
 
-fn spin(time:Res<Time>,mut obj:Single<&mut Transform, With<Mesh3d>>){
+fn spin(time: Res<Time>, mut obj: Single<&mut Transform, With<Mesh3d>>) {
     obj.rotate_x(time.delta_secs());
-    obj.rotate_z(time.delta_secs()*1.3);
+    obj.rotate_z(time.delta_secs() * 1.3);
 }

@@ -1,62 +1,52 @@
 use bevy::{
-    app::{Plugin, Update}, core_pipeline::{core_2d::Camera2d, core_3d::Camera3d}, ecs::{
-        component::Component,
-        event::EventReader,
-        query::With,
-        system::Query,
-    }, math::UVec2, render::camera::{Camera, OrthographicProjection}, window::{Window, WindowResized}
+    app::{Plugin, Update},
+    ecs::{component::Component, event::EventReader,  system::Query},
+    math::UVec2,
+    render::camera::{Camera, OrthographicProjection, ScalingMode},
+    window::{Window, WindowResized},
 };
 
+/// Fixed aspect ratio of the camera.
+/// ratio=width/height
 #[derive(Component)]
-pub struct FixedSize {
-    pub width: f32,
-    pub height: f32,
-}
+pub struct AspectRatio(pub f32);
 
-pub struct Scale2dPlugin;
+/// The plugin of the plugin.
+/// Scale the view of cameras with AspectRatio component to fit the window.
+pub struct ScalePlugin;
 
-impl Plugin for Scale2dPlugin {
+impl Plugin for ScalePlugin {
     fn build(&self, app: &mut bevy::app::App) {
-        app.add_systems(Update, adjust_camera_2d);
+        app.add_systems(Update, adjust_camera);
     }
 }
 
-pub struct Scale3dPlugin;
-
-impl Plugin for Scale3dPlugin {
-    fn build(&self, app: &mut bevy::app::App) {
-        app.add_systems(Update, adjust_camera_3d);
-    }
-}
-
-fn adjust_camera_2d(
+fn adjust_camera(
     mut e: EventReader<WindowResized>,
-    mut cam: Query<(&FixedSize, &mut Camera, &mut OrthographicProjection), With<Camera2d>>,
+    mut cam: Query<(&AspectRatio, &mut Camera)>,
     windows: Query<&Window>,
 ) {
-    for (size, mut camera, mut projection) in cam.iter_mut() {
+    for (ratio, mut camera) in cam.iter_mut() {
         for event in e.read() {
             let window = windows.get(event.window).unwrap();
             let (window_height, window_width) = (
                 window.physical_height() as f32,
                 window.physical_width() as f32,
             );
-            if window_height / window_width > size.height / size.width {
-                projection.scale = size.width / window_width * window.scale_factor();
+            if  window_width/window_height < ratio.0 {
                 let viewport = camera.viewport.get_or_insert_default();
                 viewport.physical_size = UVec2::new(
                     window_width as u32,
-                    (window_width / size.width * size.height) as u32,
+                    (window_width / ratio.0) as u32,
                 );
                 viewport.physical_position = UVec2::new(
                     (window_width / 2.0) as u32 - viewport.physical_size.x / 2,
                     (window_height / 2.0) as u32 - viewport.physical_size.y / 2,
                 );
             } else {
-                projection.scale = size.height / window_height * window.scale_factor();
                 let viewport = camera.viewport.get_or_insert_default();
                 viewport.physical_size = UVec2::new(
-                    (window_height / size.height * size.width) as u32,
+                    (window_height * ratio.0) as u32,
                     window_height as u32,
                 );
                 viewport.physical_position = UVec2::new(
@@ -68,39 +58,21 @@ fn adjust_camera_2d(
     }
 }
 
-fn adjust_camera_3d(
-    mut e: EventReader<WindowResized>,
-    mut cam: Query<(&FixedSize, &mut Camera), With<Camera3d>>,
-    windows: Query<&Window>,
-) {
-    for (size, mut camera) in cam.iter_mut() {
-        for event in e.read() {
-            let window = windows.get(event.window).unwrap();
-            let (window_height, window_width) = (
-                window.physical_height() as f32,
-                window.physical_width() as f32,
-            );
-            if window_height / window_width > size.height / size.width {
-                let viewport = camera.viewport.get_or_insert_default();
-                viewport.physical_size = UVec2::new(
-                    window_width as u32,
-                    (window_width / size.width * size.height) as u32,
-                );
-                viewport.physical_position = UVec2::new(
-                    (window_width / 2.0) as u32 - viewport.physical_size.x / 2,
-                    (window_height / 2.0) as u32 - viewport.physical_size.y / 2,
-                );
-            } else {
-                let viewport = camera.viewport.get_or_insert_default();
-                viewport.physical_size = UVec2::new(
-                    (window_height / size.height * size.width) as u32,
-                    window_height as u32,
-                );
-                viewport.physical_position = UVec2::new(
-                    (window_width / 2.0) as u32 - viewport.physical_size.x / 2,
-                    (window_height / 2.0) as u32 - viewport.physical_size.y / 2,
-                );
-            }
-        }
-    }
+/// return an OrthographicProjection with scaling mode of given size.
+/// For 2d cameras.
+pub fn fixed_size_2d(width:f32,height:f32) -> OrthographicProjection{
+    return OrthographicProjection{
+        near:-1000.0, 
+        scaling_mode: ScalingMode::Fixed { width: width, height: height },
+        ..OrthographicProjection::default_3d()
+    };
+}
+
+/// return an OrthographicProjection with scaling mode of given size.
+/// For orthographic 3d cameras.
+pub fn fixed_size_3d(width:f32,height:f32) -> OrthographicProjection{
+    return OrthographicProjection{
+        scaling_mode: ScalingMode::Fixed { width: width, height: height },
+        ..OrthographicProjection::default_3d()
+    };
 }

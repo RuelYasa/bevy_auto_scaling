@@ -1,17 +1,29 @@
 use bevy::{
-    app::{App, Startup, Update}, asset::Assets, color::palettes::css::{BLUE, WHITE}, core_pipeline::core_2d::Camera2d, ecs::{query::With, system::{Commands, Res, ResMut, Single}
-    }, math::primitives::Rectangle, render::{
+    DefaultPlugins,
+    app::{App, Startup, Update},
+    asset::Assets,
+    color::palettes::css::{BLUE, WHITE},
+    core_pipeline::core_2d::Camera2d,
+    ecs::{
+        query::With,
+        system::{Commands, Res, ResMut, Single},
+    },
+    math::primitives::Rectangle,
+    render::{
         camera::{Camera, ClearColorConfig},
         mesh::{Mesh, Mesh2d},
-    }, sprite::{ColorMaterial, MeshMaterial2d}, time::Time, transform::components::Transform, DefaultPlugins
+    },
+    sprite::{ColorMaterial, MeshMaterial2d},
+    time::Time,
+    transform::components::Transform,
 };
 
-use bevy_auto_scaling::{FixedSize, Scale2dPlugin};
+use bevy_auto_scaling::{AspectRatio, ScalePlugin, fixed_size_2d};
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugins(Scale2dPlugin)
+        .add_plugins(ScalePlugin)
         .add_systems(Startup, init)
         .add_systems(Update, spin)
         .run();
@@ -28,10 +40,8 @@ fn init(
 
     cmd.spawn((
         Camera2d::default(),
-        FixedSize {
-            width: 200.0,
-            height: 200.0,
-        },
+        AspectRatio(1.5),
+        fixed_size_2d(300.0, 200.0),
         Camera {
             clear_color: ClearColorConfig::Custom(WHITE.into()),
             ..Default::default()
@@ -39,6 +49,6 @@ fn init(
     ));
 }
 
-fn spin(time:Res<Time>,mut obj:Single<&mut Transform, With<Mesh2d>>){
+fn spin(time: Res<Time>, mut obj: Single<&mut Transform, With<Mesh2d>>) {
     obj.rotate_z(time.delta_secs());
 }

@@ -1,6 +1,6 @@
 [package]
 name = "bevy_auto_scaling"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "Auto scale cameras to fit the window."
 license = "MIT"

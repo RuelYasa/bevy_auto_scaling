@@ -11,10 +11,22 @@ With this plugin, the display of cameras can be automatically rescaled and cente
 Therefore, the users no longer have to concern on the size of window, but can focus on the "logistic" graphic itself.
 
 
-# Usage
+## Usage
 
 To auto-scale a camera, first, you need to add `ScalePlugin` to the `App`. 
 
 Then, you need to add `AspectRatio` component to the camera entity. 
 
-To fix the resolution of a `Camera2d`, you can put function `fixed_size_2d` in the camera buldle. It will return an `OrthographicProjection` component.
+To fix the resolution of a `Camera2d`, you can put function `fixed_size_2d` in the camera buldle. It will return an `Projection` component.
+
+
+## Compatible Bevy versions
+
+The main branch is compatible with the latest Bevy release.
+
+Compatibility of `bevy_auto_scaling` versions:
+
+| Bevy version | `bevy_auto_scaling` version |
+|:-------------|:--------------------------|
+| `0.16.1`     | `0.1.3`                    |
+| `0.15.2`     | `0.1.2`                    |

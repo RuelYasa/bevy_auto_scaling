@@ -3,11 +3,12 @@ use bevy::{
     ecs::{
         component::Component,
         event::EventReader,
-        schedule::{IntoSystemConfigs, common_conditions::resource_exists},
-        system::{Query, Res, ResMut, Resource},
+        resource::Resource,
+        schedule::{IntoScheduleConfigs, common_conditions::resource_exists},
+        system::{Query, Res, ResMut},
     },
     math::UVec2,
-    render::camera::{Camera, OrthographicProjection, RenderTarget, ScalingMode},
+    render::camera::{Camera, OrthographicProjection, Projection, RenderTarget, ScalingMode},
     ui::UiScale,
     window::{PrimaryWindow, Window, WindowRef, WindowResized},
 };
@@ -85,27 +86,20 @@ fn adjust_camera(
 
 /// return an OrthographicProjection with scaling mode of given size.
 /// For 2d cameras.
-pub fn fixed_size_2d(width: f32, height: f32) -> OrthographicProjection {
-    return OrthographicProjection {
-        near: -1000.0,
-        scaling_mode: ScalingMode::Fixed {
-            width: width,
-            height: height,
-        },
-        ..OrthographicProjection::default_3d()
-    };
+pub fn fixed_size_2d(width: f32, height: f32) -> Projection {
+    Projection::Orthographic(OrthographicProjection {
+        scaling_mode: ScalingMode::Fixed { width, height },
+        ..OrthographicProjection::default_2d()
+    })
 }
 
 /// return an OrthographicProjection with scaling mode of given size.
 /// For orthographic 3d cameras.
-pub fn fixed_size_3d(width: f32, height: f32) -> OrthographicProjection {
-    return OrthographicProjection {
-        scaling_mode: ScalingMode::Fixed {
-            width: width,
-            height: height,
-        },
+pub fn fixed_size_3d(width: f32, height: f32) -> Projection {
+    Projection::Orthographic(OrthographicProjection {
+        scaling_mode: ScalingMode::Fixed { width, height },
         ..OrthographicProjection::default_3d()
-    };
+    })
 }
 
 fn adjust_ui(

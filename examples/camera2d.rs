@@ -39,7 +39,7 @@ fn init(
     cmd.spawn((Mesh2d(mesh), MeshMaterial2d(material)));
 
     cmd.spawn((
-        Camera2d::default(),
+        Camera2d,
         AspectRatio(1.5),
         fixed_size_2d(300.0, 200.0),
         Camera {

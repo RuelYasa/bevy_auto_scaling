@@ -38,6 +38,9 @@ impl Plugin for ScalePlugin {
     }
 }
 
+/// epsilon for f32.
+const EPSILON: f32 = 1e-6;
+
 fn adjust_camera(
     mut e: EventReader<WindowResized>,
     mut cam: Query<(&AspectRatio, &mut Camera)>,
@@ -63,7 +66,7 @@ fn adjust_camera(
                 window.physical_height() as f32,
                 window.physical_width() as f32,
             );
-            if window_width / window_height < ratio.0 {
+            if window_width / window_height < ratio.0 + EPSILON {
                 let viewport = camera.viewport.get_or_insert_default();
                 viewport.physical_size =
                     UVec2::new(window_width as u32, (window_width / ratio.0) as u32);
@@ -84,7 +87,7 @@ fn adjust_camera(
     }
 }
 
-/// return an OrthographicProjection with scaling mode of given size.
+/// return an Projection with scaling mode of given size.
 /// For 2d cameras.
 pub fn fixed_size_2d(width: f32, height: f32) -> Projection {
     Projection::Orthographic(OrthographicProjection {
@@ -93,7 +96,7 @@ pub fn fixed_size_2d(width: f32, height: f32) -> Projection {
     })
 }
 
-/// return an OrthographicProjection with scaling mode of given size.
+/// return an Projection with scaling mode of given size.
 /// For orthographic 3d cameras.
 pub fn fixed_size_3d(width: f32, height: f32) -> Projection {
     Projection::Orthographic(OrthographicProjection {
@@ -118,7 +121,7 @@ fn adjust_ui(
         if window_height == 0.0 && window_width == 0.0 {
             continue;
         }
-        if window_width / window_height < ratio {
+        if window_width / window_height < ratio + EPSILON {
             ui_scale.0 = window_width / logic_size.width;
         } else {
             ui_scale.0 = window_height / logic_size.height;

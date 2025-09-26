@@ -3,11 +3,12 @@ use bevy::{
     ecs::{
         component::Component,
         event::EventReader,
-        schedule::{IntoSystemConfigs, common_conditions::resource_exists},
-        system::{Query, Res, ResMut, Resource},
+        resource::Resource,
+        schedule::{IntoScheduleConfigs, common_conditions::resource_exists},
+        system::{Query, Res, ResMut},
     },
     math::UVec2,
-    render::camera::{Camera, OrthographicProjection, RenderTarget, ScalingMode},
+    render::camera::{Camera, OrthographicProjection, Projection, RenderTarget, ScalingMode},
     ui::UiScale,
     window::{PrimaryWindow, Window, WindowRef, WindowResized},
 };
@@ -37,6 +38,9 @@ impl Plugin for ScalePlugin {
     }
 }
 
+/// epsilon for f32.
+const EPSILON: f32 = 1e-6;
+
 fn adjust_camera(
     mut e: EventReader<WindowResized>,
     mut cam: Query<(&AspectRatio, &mut Camera)>,
@@ -62,7 +66,7 @@ fn adjust_camera(
                 window.physical_height() as f32,
                 window.physical_width() as f32,
             );
-            if window_width / window_height < ratio.0 {
+            if window_width / window_height < ratio.0 + EPSILON {
                 let viewport = camera.viewport.get_or_insert_default();
                 viewport.physical_size =
                     UVec2::new(window_width as u32, (window_width / ratio.0) as u32);
@@ -83,29 +87,22 @@ fn adjust_camera(
     }
 }
 
-/// return an OrthographicProjection with scaling mode of given size.
+/// return an Projection with scaling mode of given size.
 /// For 2d cameras.
-pub fn fixed_size_2d(width: f32, height: f32) -> OrthographicProjection {
-    return OrthographicProjection {
-        near: -1000.0,
-        scaling_mode: ScalingMode::Fixed {
-            width: width,
-            height: height,
-        },
-        ..OrthographicProjection::default_3d()
-    };
+pub fn fixed_size_2d(width: f32, height: f32) -> Projection {
+    Projection::Orthographic(OrthographicProjection {
+        scaling_mode: ScalingMode::Fixed { width, height },
+        ..OrthographicProjection::default_2d()
+    })
 }
 
-/// return an OrthographicProjection with scaling mode of given size.
+/// return an Projection with scaling mode of given size.
 /// For orthographic 3d cameras.
-pub fn fixed_size_3d(width: f32, height: f32) -> OrthographicProjection {
-    return OrthographicProjection {
-        scaling_mode: ScalingMode::Fixed {
-            width: width,
-            height: height,
-        },
+pub fn fixed_size_3d(width: f32, height: f32) -> Projection {
+    Projection::Orthographic(OrthographicProjection {
+        scaling_mode: ScalingMode::Fixed { width, height },
         ..OrthographicProjection::default_3d()
-    };
+    })
 }
 
 fn adjust_ui(
@@ -124,7 +121,7 @@ fn adjust_ui(
         if window_height == 0.0 && window_width == 0.0 {
             continue;
         }
-        if window_width / window_height < ratio {
+        if window_width / window_height < ratio + EPSILON {
             ui_scale.0 = window_width / logic_size.width;
         } else {
             ui_scale.0 = window_height / logic_size.height;

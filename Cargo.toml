@@ -14,10 +14,8 @@ include = [
     "src/**",
 ]
 
-[dependencies]
-bevy = { version = "0.16.1", default-features = false, features = ["std"] }
 
-[dev-dependencies.bevy]
+[dependencies.bevy]
 version = "0.16.1"
 default-features = false
 # default features minus "bevy_audio" and "vorbis"

@@ -2,18 +2,15 @@ use bevy::{
     DefaultPlugins,
     app::{App, Startup, Update},
     asset::Assets,
+    camera::{Camera, Camera2d, ClearColorConfig},
     color::palettes::css::{BLUE, WHITE},
-    core_pipeline::core_2d::Camera2d,
     ecs::{
         query::With,
         system::{Commands, Res, ResMut, Single},
     },
     math::primitives::Rectangle,
-    render::{
-        camera::{Camera, ClearColorConfig},
-        mesh::{Mesh, Mesh2d},
-    },
-    sprite::{ColorMaterial, MeshMaterial2d},
+    mesh::{Mesh, Mesh2d},
+    sprite_render::{ColorMaterial, MeshMaterial2d},
     time::Time,
     transform::components::Transform,
 };

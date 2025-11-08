@@ -2,18 +2,16 @@ use bevy::{
     DefaultPlugins,
     app::{App, Startup, Update},
     asset::Assets,
+    camera::{Camera, Camera3d, ClearColorConfig},
     color::palettes::css::{BLUE, WHITE},
-    core_pipeline::core_3d::Camera3d,
     ecs::{
         query::With,
         system::{Commands, Res, ResMut, Single},
     },
+    light::PointLight,
     math::{Vec3, primitives::Cuboid},
-    pbr::{MeshMaterial3d, PointLight, StandardMaterial},
-    render::{
-        camera::{Camera, ClearColorConfig},
-        mesh::{Mesh, Mesh3d},
-    },
+    mesh::{Mesh, Mesh3d},
+    pbr::{MeshMaterial3d, StandardMaterial},
     time::Time,
     transform::components::Transform,
 };

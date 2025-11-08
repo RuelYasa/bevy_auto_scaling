@@ -1,14 +1,14 @@
 use bevy::{
     app::{Plugin, Update},
+    camera::{Camera, OrthographicProjection, Projection, RenderTarget, ScalingMode},
     ecs::{
         component::Component,
-        event::EventReader,
+        message::MessageReader,
         resource::Resource,
         schedule::{IntoScheduleConfigs, common_conditions::resource_exists},
         system::{Query, Res, ResMut},
     },
     math::UVec2,
-    render::camera::{Camera, OrthographicProjection, Projection, RenderTarget, ScalingMode},
     ui::UiScale,
     window::{PrimaryWindow, Window, WindowRef, WindowResized},
 };
@@ -42,7 +42,7 @@ impl Plugin for ScalePlugin {
 const EPSILON: f32 = 1e-6;
 
 fn adjust_camera(
-    mut e: EventReader<WindowResized>,
+    mut e: MessageReader<WindowResized>,
     mut cam: Query<(&AspectRatio, &mut Camera)>,
     windows: Query<&Window>,
     primary: Query<&PrimaryWindow>,
@@ -106,7 +106,7 @@ pub fn fixed_size_3d(width: f32, height: f32) -> Projection {
 }
 
 fn adjust_ui(
-    mut e: EventReader<WindowResized>,
+    mut e: MessageReader<WindowResized>,
     mut ui_scale: ResMut<UiScale>,
     logic_size: Res<ScalingUI>,
     windows: Query<&Window>,
